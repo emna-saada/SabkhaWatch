@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sebkha Watch — Ecological Geomatics Platform</title>
+  <style>
+    :root {
+      --primary: #2F6B4F;
+      --forest: #184735;
+      --sage: #A8C7B1;
+      --sand: #F4E7CF;
+      --salt: #FAFAF6;
+      --lagoon: #3D8FA3;
+      --amber: #F2A541;
+      --critical: #D9534F;
+      --healthy: #4CAF50;
+      --gray: #667085;
+      --border: #E4E7EC;
+      --ink: #1F2933;
+      --white: #FFFFFF;
+      --shadow: 0 12px 30px rgba(31, 41, 51, 0.08);
+      --radius: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 96px;
+    }
+
+    body {
+      font-family: Inter, Roboto, Arial, sans-serif;
+      background: var(--salt);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(250, 250, 246, 0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      color: var(--forest);
+      letter-spacing: -0.03em;
+      font-size: 1.25rem;
+    }
+
+    .logo-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), var(--lagoon));
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 900;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      color: var(--gray);
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible {
+      color: var(--primary);
+      outline: none;
+    }
+
+    .nav-links a {
+      padding: 8px 4px;
+      border-bottom: 2px solid transparent;
+      transition: 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      border-bottom-color: var(--primary);
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.95rem;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 8px 20px rgba(47, 107, 79, 0.18);
+    }
+
+    .btn-primary:hover {
+      background: var(--forest);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--primary);
+      border: 1px solid var(--sage);
+    }
+
+    .btn-secondary:hover {
+      background: var(--sand);
+      transform: translateY(-2px);
+    }
+
+    .hero {
+      padding: 72px 0 48px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #EAF3ED;
+      color: var(--primary);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: clamp(2.3rem, 5vw, 4.3rem);
+      line-height: 1.05;
+      letter-spacing: -0.06em;
+      color: var(--forest);
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      font-size: 1.12rem;
+      color: var(--gray);
+      max-width: 620px;
+      margin-bottom: 28px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .dashboard-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .map-placeholder {
+      min-height: 420px;
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 22% 28%, rgba(61, 143, 163, 0.45), transparent 18%),
+        radial-gradient(circle at 70% 38%, rgba(47, 107, 79, 0.35), transparent 16%),
+        radial-gradient(circle at 58% 76%, rgba(242, 165, 65, 0.35), transparent 14%),
+        linear-gradient(135deg, #EAF3ED, #F4E7CF);
+      border: 1px solid #D9E4DD;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .map-placeholder::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px);
+      background-size: 44px 44px;
+      opacity: 0.55;
+    }
+
+    .pin {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      box-shadow: 0 0 0 6px rgba(255,255,255,0.75);
+      border: 2px solid white;
+      z-index: 2;
+    }
+
+    .pin span {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: white;
+      left: 4px;
+      top: 4px;
+    }
+
+    .pin.green { background: var(--healthy); left: 24%; top: 28%; }
+    .pin.orange { background: var(--amber); left: 62%; top: 40%; }
+    .pin.red { background: var(--critical); left: 48%; top: 68%; }
+    .pin.blue { background: var(--lagoon); left: 72%; top: 70%; }
+
+    .map-panel {
+      position: absolute;
+      left: 18px;
+      bottom: 18px;
+      right: 18px;
+      z-index: 3;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .legend {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 0.78rem;
+      color: var(--gray);
+      font-weight: 700;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      margin-right: 4px;
+    }
+
+    .healthy { background: var(--healthy); }
+    .alert { background: var(--amber); }
+    .critical { background: var(--critical); }
+    .sensor { background: var(--lagoon); }
+
+    .metrics {
+      padding: 10px 0 44px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .metric-card, .card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      transition: 0.2s ease;
+    }
+
+    .metric-card:hover, .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 36px rgba(31, 41, 51, 0.12);
+    }
+
+    .metric-card strong {
+      display: block;
+      color: var(--forest);
+      font-size: 2rem;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+
+    .metric-card span {
+      color: var(--gray);
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    section {
+      padding: 44px 0;
+      scroll-margin-top: 96px;
+    }
+
+    #map, #reports, #projects, #storytelling {
+      scroll-margin-top: 96px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 22px;
+    }
+
+    .section-title h2 {
+      color: var(--forest);
+      font-size: clamp(1.7rem, 3vw, 2.4rem);
+      line-height: 1.15;
+      letter-spacing: -0.04em;
+    }
+
+    .section-title p {
+      color: var(--gray);
+      max-width: 520px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .badge {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+      background: #EAF3ED;
+      color: var(--primary);
+    }
+
+    .badge.orange {
+      background: #FFF3DE;
+      color: #9A5B00;
+    }
+
+    .badge.red {
+      background: #FDECEC;
+      color: #A93430;
+    }
+
+    .card h3 {
+      color: var(--forest);
+      margin-bottom: 10px;
+      font-size: 1.15rem;
+    }
+
+    .card p {
+      color: var(--gray);
+      font-size: 0.96rem;
+    }
+
+    .persona {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 26px;
+      background: linear-gradient(135deg, var(--sand), var(--sage));
+      display: grid;
+      place-items: center;
+      font-size: 2rem;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.7);
+    }
+
+    .persona-meta {
+      color: var(--gray);
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+
+    .pitch-card {
+      background: linear-gradient(135deg, white, #F7FBF8);
+      border-left: 6px solid var(--primary);
+    }
+
+    .pitch-rows {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .pitch-rows div {
+      padding: 12px;
+      border-radius: 14px;
+      background: #F7F8F5;
+      border: 1px solid var(--border);
+    }
+
+    .pitch-rows b {
+      color: var(--forest);
+    }
+
+    .report-panel {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .form-mock {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--forest);
+      margin-bottom: 8px;
+    }
+
+    .input {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 16px;
+      color: var(--gray);
+      background: #FFFFFF;
+    }
+
+    .upload {
+      min-height: 112px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      background: #F7F8F5;
+      border: 1px dashed var(--sage);
+      border-radius: 16px;
+      color: var(--gray);
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    footer {
+      padding: 42px 0;
+      border-top: 1px solid var(--border);
+      color: var(--gray);
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    @media (max-width: 920px) {
+      .hero,
+      .report-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .nav {
+        align-items: flex-start;
+        padding: 16px 0;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .map-placeholder {
+        min-height: 340px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .map-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .persona {
+        grid-template-columns: 1fr;
+      }
+
+      .avatar {
+        width: 76px;
+        height: 76px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="page nav">
+      <a class="logo" href="#map">
+        <span class="logo-mark">SW</span>
+        Sebkha Watch
+      </a>
+
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#map">Map</a>
+        <a href="#reports">Reports</a>
+        <a href="#projects">Projects</a>
+        <a href="#storytelling">Pitch Zone</a>
+      </nav>
+
+      <a class="btn btn-primary" href="#reports">Submit Report</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="page hero" id="map">
+      <div>
+        <span class="eyebrow">Ecological geomatics for Tunisia</span>
+        <h1>Protecting Tunisian sabkhats through maps, data, and community action.</h1>
+        <p>
+          Sebkha Watch connects researchers, citizens, municipalities, and donors through
+          a live environmental dashboard for saline wetlands such as Sabkhat Sidi El Hani,
+          Sabkhat El Kelbia, and Sabkhat Ariana.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#map">View Live Map</a>
+          <a class="btn btn-secondary" href="#storytelling">Explore Solutions</a>
+        </div>
+      </div>
+
+      <div class="dashboard-card" aria-label="Mock interactive map">
+        <div class="map-placeholder">
+          <div class="pin green"><span></span></div>
+          <div class="pin orange"><span></span></div>
+          <div class="pin red"><span></span></div>
+          <div class="pin blue"><span></span></div>
+
+          <div class="map-panel">
+            <div>
+              <strong>National Sabkhat Health Map</strong>
+              <div class="legend">
+                <span><i class="dot healthy"></i>Healthy</span>
+                <span><i class="dot alert"></i>Alert</span>
+                <span><i class="dot critical"></i>Critical</span>
+                <span><i class="dot sensor"></i>Sensor</span>
+              </div>
+            </div>
+            <button class="btn btn-secondary">Layers</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="page metrics" aria-label="Dashboard metrics">
+      <div class="metric-card">
+        <strong>18</strong>
+        <span>Monitored sabkhats</span>
+      </div>
+      <div class="metric-card">
+        <strong>7</strong>
+        <span>Active alerts</span>
+      </div>
+      <div class="metric-card">
+        <strong>126</strong>
+        <span>Citizen reports</span>
+      </div>
+      <div class="metric-card">
+        <strong>9</strong>
+        <span>Fundable projects</span>
+      </div>
+    </div>
+
+    <section class="page">
+      <div class="section-title">
+        <div>
+          <h2>One platform, four user groups</h2>
+          <p>Designed for researchers, volunteers, municipalities, and ecological investors.</p>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <article class="card persona">
+          <div class="avatar" aria-hidden="true">👩‍🔬</div>
+          <div>
+            <span class="badge">Researcher persona</span>
+            <h3>Dr. Nour S.</h3>
+            <p class="persona-meta">34 · Wetland ecologist · Tunis</p>
+            <p>
+              Needs weekly water quality and satellite indicators for Sabkhat El Kelbia
+              without constant field visits. She validates citizen observations and exports
+              sensor data for research.
+            </p>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="badge orange">Citizen reporting</span>
+          <h3>Report environmental incidents</h3>
+          <p>
+            Volunteers can upload geolocated photos of pollution, fires, invasive species,
+            or biodiversity sightings. Reports appear as map pins after validation.
+          </p>
+        </article>
+
+        <article class="card">
+          <span class="badge">Municipal response</span>
+          <h3>Coordinate local action</h3>
+          <p>
+            Municipal teams filter alerts by severity and location, assign response status,
+            and track cleanup or restoration progress through public dashboards.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="page" id="reports">
+      <div class="section-title">
+        <div>
+          <h2>Submit a field report</h2>
+          <p>Simple enough for citizens, structured enough for scientific moderation.</p>
+        </div>
+      </div>
+
+      <div class="report-panel">
+        <div class="form-mock">
+          <label for="location">Location</label>
+          <div class="input" id="location">Sabkhat Sidi El Hani · GPS confirmed</div>
+
+          <label for="type">Incident type</label>
+          <div class="input" id="type">Garbage dumping</div>
+
+          <label>Photo evidence</label>
+          <div class="upload">Upload wetland photo</div>
+
+          <label for="severity">Severity</label>
+          <div class="input" id="severity">Orange alert · requires verification</div>
+
+          <button class="btn btn-primary">Submit for Moderation</button>
+        </div>
+
+        <div class="card">
+          <span class="badge red">Visible feedback</span>
+          <h3>Report status: Awaiting validation</h3>
+          <p>
+            After submission, users see a clear confirmation. Moderators can mark the report
+            as new, verified, in progress, or resolved. This supports Nielsen’s visibility
+            of system status heuristic.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="projects">
+      <div class="section-title">
+        <div>
+          <h2>Project incubator</h2>
+          <p>Turn ecological problems into fundable restoration and monitoring projects.</p>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <article class="card">
+          <span class="badge">Restoration</span>
+          <h3>Sabkhat Sidi El Hani cleanup corridor</h3>
+          <p>
+            Community cleanup and monitoring route with before/after reporting,
+            volunteer coordination, and municipal validation.
+          </p>
+        </article>
+
+        <article class="card">
+          <span class="badge">IoT</span>
+          <h3>Salinity sensor pilot</h3>
+          <p>
+            Install low-cost solar sensor nodes to track salinity, water level,
+            conductivity, and temperature.
+          </p>
+        </article>
+
+        <article class="card">
+          <span class="badge">Biodiversity</span>
+          <h3>Native halophyte nursery</h3>
+          <p>
+            Grow salt-tolerant native plants for degraded sabkha margins and
+            track restoration using satellite imagery.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="page" id="storytelling">
+      <div class="section-title">
+        <div>
+          <h2>Startup storytelling pitch</h2>
+          <p>Innovation cards present ecological solutions in a clear investor-ready format.</p>
+        </div>
+      </div>
+
+      <article class="card pitch-card">
+        <span class="badge">Featured solution</span>
+        <h3>Smart buoy for real-time salinity monitoring</h3>
+
+        <div class="pitch-rows">
+          <div><b>Problem:</b> Salinity and water-level changes in sabkhats are often detected too late because field measurements are irregular.</div>
+          <div><b>Solution:</b> Deploy solar-powered smart buoys that measure salinity, conductivity, temperature, and water level, then send readings to Sebkha Watch.</div>
+          <div><b>Impact:</b> More frequent monitoring supports faster response to drought stress, pollution events, and ecological imbalance.</div>
+          <div><b>Call to Action:</b> Fund a 6-month pilot with 5 smart buoys and technical mentorship from IoT partners.</div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <div class="page">
+      Sebkha Watch · Design Thinking prototype · Built for ecological monitoring, community action, and geomatics storytelling.
+    </div>
+  </footer>
+</body>
+</html>
